@@ -7,6 +7,4 @@ export const goals = pgTable("goals", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }),
-  deletedAt: timestamp("deleted_at", { withTimezone: true }),
 });
