@@ -1,28 +1,39 @@
-import fastify from 'fastify'
-import { createGoal } from '../services/create-goal';
-import z from 'zod';
+import z from "zod";
+import fastify from "fastify";
+import { createGoal } from "../services/create-goal";
 
-export const AppServer = fastify()
+import {
+  serializerCompiler,
+  validatorCompiler,
+  type ZodTypeProvider,
+} from "fastify-type-provider-zod";
 
-AppServer.post("/goals", async (request) => {
-  const createGoalSchema = z.object({
-    title: z.string(),
-    desiredWeeklyFrequency: z.number().min(1).max(7),
-  });
+export const AppServer = fastify().withTypeProvider<ZodTypeProvider>();
 
-  const body: any = createGoalSchema.parse(request.body);
+AppServer.setValidatorCompiler(validatorCompiler);
+AppServer.setSerializerCompiler(serializerCompiler);
 
-  await createGoal({
-    title: body.title,
-    desiredWeeklyFrequency: body.desiredWeeklyFrequency,
-  });
+AppServer.post(
+  "/goals",
+  {
+    schema: {
+      body: z.object({
+        title: z.string(),
+        desiredWeeklyFrequency: z.number().min(1).max(7),
+      }),
+    },
+  },
+  async (request) => {
+    const { title, desiredWeeklyFrequency } = request.body;
+    await createGoal({
+      title,
+      desiredWeeklyFrequency,
+    });
+  }
+);
+
+AppServer.listen({
+  port: 3333,
+}).then(() => {
+  console.log("HTTP server running on http://localhost:3333");
 });
-
-
-AppServer
-  .listen({
-    port: 3333,
-  })
-  .then(() => {
-    console.log('HTTP server running on http://localhost:3333')
-  })
