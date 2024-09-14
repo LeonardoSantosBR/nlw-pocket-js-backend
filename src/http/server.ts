@@ -11,9 +11,13 @@ import { createGoalsRoute } from "./routes/post-goals";
 import { getPendingGoalsRoute } from "./routes/get-pending-goals";
 import { createGoalsCompletionRoute } from "./routes/post-goals-completion";
 import { getWeekSummaryRoute } from "./routes/get-week-summary";
+import fastifyCors from "@fastify/cors";
 
 //config
 export const AppServer = fastify().withTypeProvider<ZodTypeProvider>();
+AppServer.register(fastifyCors, {
+  origin: "*",
+});
 AppServer.setValidatorCompiler(validatorCompiler);
 AppServer.setSerializerCompiler(serializerCompiler);
 
