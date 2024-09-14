@@ -8,7 +8,7 @@ export async function getWeekPendingGoals() {
   const firstDayOfWeek = dayjs().startOf("week").toDate();
   const lastDayOfWeek = dayjs().endOf("week").toDate();
 
-  const goalsCreatedUpToWeek = db.$with("goals_created_up_to_week").as(
+  const goalsCreatedUpToWeek = db.$with("goals_created_up_to_week").as(  //cte de busca de metas durante a semana especifica.
     db
       .select({
         id: goals.id,
@@ -20,7 +20,7 @@ export async function getWeekPendingGoals() {
       .where(lte(goals.createdAt, lastDayOfWeek))
   );
 
-  const goalCompletionCount = db.$with("goal_completion_count").as(
+  const goalCompletionCount = db.$with("goal_completion_count").as(   //cte de busca das conclusoes das metas durante a semana especifica. 
     db
       .select({
         goalId: goalCompletions.goalId,
@@ -36,7 +36,7 @@ export async function getWeekPendingGoals() {
       .groupBy(goalCompletions.id)
   );
 
-  const query = await db
+  const query = await db  //consulta sql utilizando as subqueries.
     .with(goalsCreatedUpToWeek, goalCompletionCount)
     .select({
       id: goalsCreatedUpToWeek.id,
@@ -51,7 +51,7 @@ export async function getWeekPendingGoals() {
       goalCompletionCount,
       eq(goalCompletionCount.goalId, goalsCreatedUpToWeek.id)
     )
-      // .toSQL();
+      // .toSQL(); método que exibe a query no console.
 
   return {
     query,
